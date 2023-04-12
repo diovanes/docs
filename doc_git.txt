@@ -430,3 +430,26 @@ Lembre-se de que o uso de fast-forward, rebase e merge depende da situação em 
 
 
 
+======
+
+Diovane Schumann
+descreva as boas praticas de proteção, restrições de acesso e commit, para as branches master, develop e release.
+Existem algumas boas práticas de proteção, restrições de acesso e commit que podem ser aplicadas às branches master, develop e release em um projeto Git. Aqui estão algumas delas:
+
+Proteção da branch master: a branch master geralmente contém a versão estável do código que será liberada para os usuários finais. É importante proteger a branch master para evitar que commits não testados ou não aprovados sejam enviados para ela. Algumas boas práticas para proteger a branch master incluem:
+Configurar permissões de gravação para a branch master para garantir que apenas os membros da equipe autorizados possam fazer push nessa branch.
+Utilizar ferramentas de integração contínua para executar testes automatizados e garantir que todos os testes passem antes de fazer push na branch master.
+Realizar revisões de código (code reviews) para garantir que os commits enviados para a branch master sejam de alta qualidade e atendam aos padrões de código do projeto.
+Restrições de acesso na branch develop: a branch develop é a principal linha de desenvolvimento do projeto e é onde as funcionalidades são desenvolvidas e testadas. Algumas boas práticas para restringir o acesso à branch develop incluem:
+Configurar permissões de gravação para a branch develop para garantir que apenas os membros da equipe autorizados possam fazer push nessa branch.
+Utilizar as pull requests para controlar o acesso à branch develop. Os membros da equipe devem enviar uma pull request para a branch develop, que será revisada e aprovada por outros membros da equipe antes de ser mesclada.
+Utilizar ferramentas de integração contínua para executar testes automatizados e garantir que todos os testes passem antes de fazer merge na branch develop.
+Restrições de acesso na branch release: a branch release é usada para preparar uma versão para liberação. Algumas boas práticas para restringir o acesso à branch release incluem:
+Configurar permissões de gravação para a branch release para garantir que apenas os membros da equipe autorizados possam fazer push nessa branch.
+Utilizar as pull requests para controlar o acesso à branch release. Os membros da equipe devem enviar uma pull request para a branch release, que será revisada e aprovada por outros membros da equipe antes de ser mesclada.
+Utilizar ferramentas de integração contínua para executar testes automatizados e garantir que todos os testes passem antes de fazer merge na branch release.
+Boas práticas de commit: para garantir que os commits sejam de alta qualidade e atendam aos padrões de código do projeto, aqui estão algumas boas práticas que podem ser aplicadas:
+Escrever mensagens de commit descritivas e claras que expliquem o que foi feito no commit.
+Dividir as mudanças em commits lógicos e atômicos.
+Evitar fazer commits de arquivos grandes ou binários.
+Não cometer mudanças diretamente na branch master ou develop. Em vez disso, criar uma nova branch e enviar uma pull request para mesclar as mudanças na branch correspondente.
