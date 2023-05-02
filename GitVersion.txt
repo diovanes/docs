@@ -1,0 +1,190 @@
+O Que é Commit Semântico?
+
+Commit semântico ou conventional commit, em sua especificação formal, é uma das formas que se pode fazer padronização de commits dentro de um projeto de desenvolvimento de software.
+
+Ele fornece um conjunto fácil de regras para criar um histórico de confirmação explícito; o que torna mais fácil escrever ferramentas automatizadas em cima.
+
+Idioma Padrão
+
+De acordo a votação feita no questionário sobre DDD e Refactor, identificamos que nossos times e demais areas entendem que é mais vantajoso escrevermos as mensagens dos commits em português.
+
+Isso realmente é positivo, visto que futuramente poderemos utilizar os commits padronizados para gerar automaticamente um release note das entregas realizadas em cada aplicação.
+
+Dito isso, por padrão nosso as mensagens devem estar descritas em português com exceção do tipo de commit.
+
+Referencia
+
+Afim de termos uma maior rastreabilidade das alterações realizadas e facilitar a geração de um changelog automatizado na futura, passaremos a requisitar uma chave de referência em cada commit.
+
+A referência deverá ser informada junto a identificação do tipo de commit e entre colchetes ([ref]).
+
+Por padrão a chave de referência será o identificador da tarefa no Jira, o mesmo utilizado na nomenclatura da branch, é importante que seja escrito em letra maiúscula, veja o exemplo abaixo.
+git commit -m "build[CAR-10]: Alteração no Parent-POM" --author="Nome<nome@sejaouze.com.br>"
+
+Tipos de Commit
+
+A tipagem dos commits possuem a finalidade de comunicar a intenção de processamento que o utilizador teve em sua execução, abaixo seguem os tipos utilizados por nossos times:
+
+build: Alterações que afetam o build (construção) do sistema ou dependências externas. (exemplos de escopo: pom, gulp, npm …)git commit -m "build[CAR-10]: Alteração no Parent-POM" --author="Nome<nome@sejaouze.com.br>"
+
+ci: Alterações nas configurações de CI como em arquivos e scripts. (exemplos de escopo: Jenkinsfile)git commit -m "ci[CAR-10]: Alteração na pipeline" --author="Nome<nome@sejaouze.com.br>"
+
+docs: Apenas alterações na documentação. (exemplos de escopo: swagger, comentários)git commit -m "docs[CAR-10]: Alteração na swagger" --author="Nome<nome@sejaouze.com.br>"
+
+feat: Desenvolvimento de uma nova funcionalidade.git commit -m "feat[CAR-10]: Nova funcionalidade" --author="Nome<nome@sejaouze.com.br>"
+
+fix: Desenvolvimento de uma correção.git commit -m "fix[CAR-10]: Correção de um erro" --author="Nome<nome@sejaouze.com.br>"
+
+pref: Uma alteração de código visando apenas melhorar a performance.git commit -m "pref[CAR-10]: Ajustes de performance" --author="Nome<nome@sejaouze.com.br>"
+
+refactor: Uma alteração de código que não corrige um bug nem adiciona um recurso.git commit -m "refactor[CAR-10]: Refatoração de método" --author="Nome<nome@sejaouze.com.br>"
+
+test: Adicionando novos testes ou corrigindo testes existentes.git commit -m "test[CAR-10]: Novo teste para conta" --author="Nome<nome@sejaouze.com.br>"
+
+env: Alteração ou adição de arquivos referentes a variáveis de ambiente. (exemplos de escopo: bootstrap, application-local)git commit -m "env[CAR-10]: Alterado apontamento" --author="Nome<nome@sejaouze.com.br>"
+
+style: Alterações que não afetam o significado do código, mas podem alterar seu layout.git commit -m "style[CAR-10]: Alterado cor do frontend" --author="Nome<nome@sejaouze.com.br>"
+
+revert: Reversão de commits anteriores.git commit -m "revert[CAR-10]: reversão do commit <hash>" --author="Nome<nome@sejaouze.com.br>"
+
+Próximos Passos
+
+Existem outros padrões estabelecidos sobre esta convenção de commits como padrão da mensagem, utilização de escopos, entre outros.
+
+Vamos primeiramente azeitar a utilização da tipagem e do idioma padrão para posteriormente executarmos os próximos passos.
+
+Fontes e Outros
+
+Conventional Commits
+
+angular-commit-message-guidelines
+
+O que é Commit e Commits Semânticos: saiba tudo! (geekhunter.com.br)
+
+Conventional Commit - IntelliJ IDEs Plugin | Marketplace (jetbrains.com)
+
+
+
+
+===========
+
+
+
+
+Comando GIT
+
+Criamos este artigo com alguns casos que podem ocorrer no dia a dia, e assim exemplificamos como realizar os processos.
+
+Branch
+
+  
+
+# Cria uma branch chamada epic/JOB-01 com base na versão mais atual da branch DEVELOP
+git checkout -b epic/JOB-01 --no-track origin/develop
+
+  
+
+# Cria uma branch chamada feature/JOB-01 com base na versão mais atual da branch DEVELOP
+git checkout -b feature/JOB-01 --no-track origin/develop
+
+  
+
+# Cria uma branch chamada hotfix/JOB-01 com base na versão mais atual da branch DEVELOP
+git checkout -b hotfix/JOB-01 --no-track origin/develop
+
+# Podemos enviar a nossa nova branch epic para o repositório remoto
+git push --set-upstream origin epic/JOB-01
+
+  
+
+# Podemos enviar a nossa nova branch feature para o repositório remoto
+git push --set-upstream origin feature/JOB-01
+
+  
+
+# Podemos enviar a nossa nova branch hotfix para o repositório remoto
+git push --set-upstream origin hotfix/JOB-01
+
+# Podemos deletar a nossa nova branch epic para o repositório remoto
+git push -d origin epic/JOB-01
+
+  
+
+# Podemos deletar a nossa nova branch feature para o repositório remoto
+git push -d origin feature/JOB-01
+
+  
+
+# Podemos deletar a nossa nova branch hotfix para o repositório remoto
+git push -d origin hotfix/JOB-01
+
+# Podemos deletar a nossa nova branch epic para o repositório remoto
+git push -d origin epic/JOB-01
+
+  
+
+# Podemos deletar a nossa nova branch feature para o repositório remoto
+git push -d origin feature/JOB-01
+
+  
+
+# Podemos deletar a nossa nova branch hotfix para o repositório remoto
+git push -d origin hotfix/JOB-01
+
+Commit
+
+# 1 - Adicionar os itens alterados
+git add -A
+# 2 - Realizar um commit informando a mensagem e o autor
+git commit -m "feat: Nova tela" --author="Seu Nome<seu.nome@sejaouze.com.br>"
+
+Obs.: Importante usar o padrão de commit semântico apresentado, conforme nosso padrão.
+
+Finalizar Desenvolvimento
+
+ →  
+
+# 1 - Equalizando a sua EPIC com a DEVELOP
+git pull origin develop
+# 2 - Verificando se ocorreram conflitos, caso positivo, corrija-os
+git status
+# 3 - Enviado seus commits para o repositório remoto
+git push
+
+ →   
+
+# 1 - Equalizando a sua FEATURE com a DEVELOP
+git pull origin develop
+# 2 - Verificando se ocorreram conflitos, caso positivo, corrija-os
+git status
+# 3 - Enviado seus commits para o repositório remoto
+git push
+
+ → 
+
+# 1 - Equalizando a sua FEATURE com a EPIC
+git pull origin epic/JOB-01
+# 2 - Verificando se ocorreram conflitos, caso positivo, corrija-os
+git status
+# 3 - Enviado seus commits para o repositório remoto
+git push
+
+Atualizar o Repositório Local
+
+# Desta forma baixamos as atualizações remotas de sua branch atual
+git pull
+
+# Desta forma baixamos as atualizações de uma branch especifica para nossa branch local
+git pull origin/branch-name
+
+# Desta forma atualizamos o repo local, mas não atualizamos as branch diretamente
+git fetch
+
+Outros Comandos
+
+# Após add os arquivos alterados, podemos remover um arquivo especifico
+git restore --staged src/main/resources/application-local.yml
+
+Fontes
+
+GitFichas
