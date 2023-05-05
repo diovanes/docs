@@ -1,0 +1,126 @@
+
+Quais são as boas práticas de Git?
+1) Utilize o modo imperativo
+Por convenção, o Git usa sempre o modo imperativo nos  padrões de suas mensagens. Isso significa que, quando você  utiliza o merge ou um revert, essas ações seguem essa forma de comando e, por isso, na hora de elaborar os assuntos dos seus commits, é interessante que você siga essa regra também.
+
+Uma dica boa para facilitar a criação dos commits, é validá-los usando a seguinte frase: “Se aplicado, esse commit vai” (ou, no inglês, “If applied, this commit will”). Veja um exemplo abaixo:
+
+$ git log --oneline -4 
+
+d759236 Change config to upload 
+
+ae6a172 Merge branch 'assync-spam-job' into 'master' 
+
+ef10959 Disable worker for spam learn. 
+
+4210b8c Merge branch 'sentry-error-spam' into 'master
+
+Neste caso, a frase ficaria da seguinte forma: “If applied, this commit will Change config to upload”. A princípio, pode parecer mais difícil escrever os commits dessa forma, já que é menos usual. No entanto, após pouco tempo de uso, a ação ficará bem mais fácil.
+
+2) Procure ser direto e explicativo em seus commits
+Realmente, é muito mais rápido fazer um commit utilizando a sintaxe “git commit -m” e passando uma mensagem resumida do que foi feito. Porém, essa regra faz com que você perca a ideia original do commit, que é ser uma página na história do seu projeto, e não apenas um resumo em uma linha.
+
+Nesse caso, o seu commit ficaria assim:
+
+git commit -m ‘Adjust images on upload’
+
+Com essa mensagem, um possível leitor não entende porque essa modificação foi feita. Procure resumir o que foi feito na primeira linha, mas com algum detalhe, pular uma linha e descrever exatamente o que foi feito, se possível colocando algum link ou referência a tarefa que iniciou a modificação.
+
+git commit -m”Appling auto-adjust images on upload to avoid distotiong
+Users was uploading images to their profile but it was distorting the pics, now the pics are auto-adjusting.”
+
+Dessa forma, além de deixar a sua ação mais completa, ainda é possível criar um resumo do assunto e um corpo para o seu commit, sem deixa de facilitar a leitura do histórico no git log:
+
+$ git log --oneline -4 
+
+4210b8c Appling auto-Aadjust images on upload to avoid distotiong
+
+d759236 Change config to upload 
+
+ae6a172 Merge branch 'assync-spam-job' into 'master' 
+
+ef10959 Disable worker for spam learn. 
+
+3) Considere incluir o link do card da sua história no commit
+Incluir o link do card no commit facilita na hora de encontrar uma referência mais completa dos motivos pelos quais aquela história foi feita. Assim, é possível mostrar também alguns exemplos e, até, detalhes técnicos importantes que fazem parte das boas práticas de git.
+
+4) Limite o assunto do commit a 50 caracteres
+O número 50 é uma base para que o assunto possa ser lido por completo em qualquer interface. No entanto, essa regra não precisa ser seguida a ferro e fogo, ok?
+
+Considere seguir um padrão entre os tópicos 2 e 3, utilize os 50 primeiros caracteres para um resumo do que foi feito e será visualizado em qualquer interface, que permita trabalhar uma mensagem mais detalhada nas próximas linhas.
+
+5) Capitalize o assunto do seu commit
+Por fim, capitalizar o assunto do seu commit é um ponto bastante importante para que ele seja encontrado mais facilmente em uma busca. Veja, a seguir, exemplos de commit com e sem capitalização:
+
+Sem capitalizar o assunto
+
+$ git log --oneline -5 
+
+d2cad72 change config app to run 
+
+d759236 change config to upload 
+
+ae6a172 Merge branch 'assync-spam-job' into 'master' 
+
+ef10959 disable worker for spam learn. 
+
+4210b8c Merge branch 'sentry-error-spam' into 'master
+
+Capitalizando o assunto
+
+$ git log --oneline -5 
+
+d2cad72 Change config app to run 
+
+d759236 Change Config to upload 
+
+ae6a172 Merge branch 'assync-spam-job' into 'master' 
+
+ef10959 Disable worker for spam learn. 
+
+4210b8c Merge branch 'sentry-error-spam' into 'master'
+boas práticas de git
+
+
+6) Nunca guarde arquivos binários no seu projeto
+Apesar de ser uma ferramenta muito poderosa, o Git foi desenhado com um propósito voltado a arquivos de textos, principalmente com o foco em acompanhar mudanças nesses arquivos, normalmente códigos.
+
+Normalmente, encontramos ferramentas que facilitam a visualização do projeto através de uma imagem ou um PDF gerados, e ficamos tentados a guardar essa documentação no git, junto ao projeto. Porém esses documentos não versionados pelo git é feito com textos, e isso pode ocasionar o projeto a dobrar de tamanho a cada atualização desses arquivos.
+
+Portanto, atente-se a passar indicações da utilização da ferramenta, preferencialmente através de um README, evitando salvar esses documentos junto ao projeto.
+
+E então, gostou das boas práticas de Git que indicamos neste post? Tem alguma dúvida ou gostaria de compartilhar a sua opinião? Então, aproveite e deixe o seu comentário e visite o nosso site!
+
+
+Configurar corretamente a autoria
+A autoria permite saber quem exatamente fez cada commit (o famoso git blame). É bem simples, basta usar os seguintes comandos:
+git config --global user.name "Seu nome"
+git config --global user.email seu_email@exemplo.com
+
+Escrever o que foi feito, o que não foi feito e porque
+No uma boa mensagem de commit tem o que foi feito, o porque foi feito e o que tentou fazer mas não deu certo (claro que dentro do bom senso, afinal, nem todos os commits carregam esse peso).
+
+Fazer vários commits, porém fazer o rebase
+Uma das funções do git é servir de backup remoto. Você pode fazer commits diretos com as tentativas de arrumar um problema, ou mesmo fazer commits todos os dias. Na hora do PR, é só juntar as alterações feitas, descartar o lixo e fazer um ou mais commits relevantes.
+O mesmo serve para a revisão de código de um PR. Basta ir fazendo as alterações necessárias e depois fazer um rebase para unir tudo com o commit principal. Isso gera uma árvore limpa e fácil de navegar.
+
+Quando fazer o PR, já adicionar os testes
+Sempre que possível, já adicione os testes dentro do PR. Além de ajudar a entender melhor o que foi feito, garante que a cobertura de testes do sistema permanecerá alta.
+
+Não integrar código comentado
+O git já consegue manter o histórico de tudo o que foi feito. Se você seguir boas práticas, não há necessidade para fazer PR com código comentado
+
+Evitar de reescrever a história da Master
+Aqui estou falando de qualquer branch que mais de uma pessoa utiliza. Quando rola rebases, é possível que o trabalho de um acabe prejudicando o de outro.
+
+
+Proteger a master
+Acidentes acontecem, por isso é importante impedir as pessoas de fazerem pushs direto na master ou develop. Isso é feito através da configuração do repositório.
+
+
+Usar um bom .gitignore
+Um bom .gitiginore ajuda a evitar o envio de arquivos binários. Eu Eu gosto bastante o do gitiginore.io.
+
+
+
+
