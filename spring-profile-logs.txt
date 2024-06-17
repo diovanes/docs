@@ -1,0 +1,268 @@
+### Documentação para Configuração de Logs em Ambientes Distintos com Spring Profiles
+
+Nesta documentação, vamos configurar logs de forma distinta para diferentes ambientes (dev, hml, prod) usando Spring Profiles e as bibliotecas de logs Logback e Log4j2.
+
+#### 1. Estrutura do Projeto
+
+Assumimos que você já possui um projeto Spring Boot. Caso contrário, crie um novo projeto usando Spring Initializr ou sua IDE preferida.
+
+#### 2. Configuração de Logs com Logback
+
+##### 2.1. Estrutura de Diretórios
+
+Organize seus arquivos de configuração do Logback da seguinte forma:
+
+```
+src/main/resources/
+    logback-dev.xml
+    logback-hml.xml
+    logback-prod.xml
+    application.properties
+    application-dev.properties
+    application-hml.properties
+    application-prod.properties
+```
+
+##### 2.2. Arquivo de Configuração do Logback para Desenvolvimento (logback-dev.xml)
+
+```xml
+<configuration>
+    <property name="LOG_FILE" value="logs/dev-app.log" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+```
+
+##### 2.3. Arquivo de Configuração do Logback para Homologação (logback-hml.xml)
+
+```xml
+<configuration>
+    <property name="LOG_FILE" value="logs/hml-app.log" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+```
+
+##### 2.4. Arquivo de Configuração do Logback para Produção (logback-prod.xml)
+
+```xml
+<configuration>
+    <property name="LOG_FILE" value="logs/prod-app.log" />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/prod-app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+```
+
+##### 2.5. Configuração do application.properties
+
+Configure o arquivo `application.properties` para incluir a configuração padrão:
+
+```properties
+# Defina o perfil ativo
+spring.profiles.active=@spring.profiles.active@
+```
+
+##### 2.6. Configuração dos Arquivos application-<profile>.properties
+
+Configure cada arquivo de perfil para apontar para o arquivo de configuração de logs correto.
+
+###### application-dev.properties
+
+```properties
+# Configuração específica de desenvolvimento
+logging.config=classpath:logback-dev.xml
+```
+
+###### application-hml.properties
+
+```properties
+# Configuração específica de homologação
+logging.config=classpath:logback-hml.xml
+```
+
+###### application-prod.properties
+
+```properties
+# Configuração específica de produção
+logging.config=classpath:logback-prod.xml
+```
+
+#### 3. Configuração de Logs com Log4j2
+
+##### 3.1. Estrutura de Diretórios
+
+Organize seus arquivos de configuração do Log4j2 da seguinte forma:
+
+```
+src/main/resources/
+    log4j2-dev.xml
+    log4j2-hml.xml
+    log4j2-prod.xml
+    application.properties
+    application-dev.properties
+    application-hml.properties
+    application-prod.properties
+```
+
+##### 3.2. Arquivo de Configuração do Log4j2 para Desenvolvimento (log4j2-dev.xml)
+
+```xml
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="File" fileName="logs/dev-app.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+##### 3.3. Arquivo de Configuração do Log4j2 para Homologação (log4j2-hml.xml)
+
+```xml
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="File" fileName="logs/hml-app.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+##### 3.4. Arquivo de Configuração do Log4j2 para Produção (log4j2-prod.xml)
+
+```xml
+<Configuration status="WARN">
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="logs/prod-app.log"
+                     filePattern="logs/prod-app-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="warn">
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+##### 3.5. Configuração do application.properties
+
+Configure o arquivo `application.properties` para incluir a configuração padrão:
+
+```properties
+# Defina o perfil ativo
+spring.profiles.active=@spring.profiles.active@
+```
+
+##### 3.6. Configuração dos Arquivos application-<profile>.properties
+
+Configure cada arquivo de perfil para apontar para o arquivo de configuração de logs correto.
+
+###### application-dev.properties
+
+```properties
+# Configuração específica de desenvolvimento
+logging.config=classpath:log4j2-dev.xml
+```
+
+###### application-hml.properties
+
+```properties
+# Configuração específica de homologação
+logging.config=classpath:log4j2-hml.xml
+```
+
+###### application-prod.properties
+
+```properties
+# Configuração específica de produção
+logging.config=classpath:log4j2-prod.xml
+```
+
+#### 4. Alterando o Perfil Ativo
+
+Para alternar entre os diferentes perfis, você pode definir o perfil ativo ao iniciar a aplicação, por exemplo:
+
+```sh
+# Para desenvolvimento
+java -jar -Dspring.profiles.active=dev seu-aplicativo.jar
+
+# Para homologação
+java -jar -Dspring.profiles.active=hml seu-aplicativo.jar
+
+# Para produção
+java -jar -Dspring.profiles.active=prod seu-aplicativo.jar
+```
+
+### Conclusão
+
+Com estas configurações, você pode facilmente gerenciar diferentes níveis de log e destinos para ambientes de desenvolvimento, homologação e produção. Essa abordagem melhora a observabilidade e facilita a identificação de problemas em diferentes estágios do ciclo de vida do seu aplicativo.
