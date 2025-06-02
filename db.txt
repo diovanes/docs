@@ -1,0 +1,430 @@
+A seguir, um questionário técnico completo que reúne todas as perguntas que devem ser respondidas para orientar a escolha entre diferentes modelos de banco de dados (relacional, não-relacional/documento, chave-valor, wide-column, grafo etc.). Organizei em categorias para facilitar o levantamento das informações e a comparação de alternativas.
+
+---
+
+## 1. Perfil da Aplicação e Casos de Uso
+
+1.1. Qual é o propósito principal do sistema?
+
+- Aplicação transacional (OLTP) ou analítica (OLAP)?
+- Sistema de e-commerce, IoT, redes sociais, plataforma de mensagens em tempo real, sistema corporativo, etc.
+
+  1.2. Quais são os principais tipos de operações realizadas?
+
+- Leituras simples (busca por chave)?
+- Consultas complexas (joins, agregações, relatórios)?
+- Escritas intensivas (insert/update/delete)?
+- Misto (read-heavy, write-heavy ou balanceado)?
+
+  1.3. Existe necessidade de relacionamentos complexos entre entidades?
+
+- Relações 1\:N, N\:M, heranças, tabelas de junção?
+- Grafos de relacionamentos (ex.: redes sociais, recomendações)?
+
+  1.4. Quais são as consultas mais frequentes e que precisam ser rápidas?
+
+- Pesquisa full-text, filtros por múltiplos campos, busca geoespacial, queries em grafos?
+- Operações atômicas ou lote de documentos?
+
+  1.5. Há necessidade de modelar hierarquias ou dados semi-estruturados?
+
+- Campos com listas/arrays aninhados, documentos JSON aninhados, metadados flexíveis?
+
+---
+
+## 2. Características dos Dados
+
+2.1. Qual é o formato e a estrutura dos dados a serem armazenados?
+
+- Dados estritamente tabulares (colunas definidas, tipos fixos)?
+- Documentos JSON/XML variáveis (campos que podem ser diferentes por registro)?
+- Pares chave-valor sem estrutura rígida?
+- Colunas dinâmicas (wide-column) ou grafos?
+
+  2.2. Qual o volume de dados atual (em GB/TB) e a projeção de crescimento para 1, 3 e 5 anos?
+
+- Taxa de crescimento diário/mensal de registros?
+- Retenção histórica (dados arquivados vs dados ativos)?
+
+  2.3. Qual a granularidade dos registros?
+
+- Objetos grandes (> 1 MB cada)?
+- Documentos médios (\~ 10–100 KB)?
+- Registros pequenos (< 1 KB)?
+
+  2.4. Os dados exigem esquema (schema) rígido ou evoluem com frequência?
+
+- Versões de entidade são previsíveis (sempre mesmas colunas)?
+- Necessidade de adicionar campos “on-the-fly” sem downtime?
+
+  2.5. Existe a necessidade de armazenar tipos especiais de dados (geoespaciais, séries temporais, mídias binárias)?
+
+---
+
+## 3. Requisitos de Performance e Escalabilidade
+
+3.1. Quantas transações simultâneas (conexões/queries concorrentes) são esperadas no pico?
+
+- Média de TPS (transações por segundo) ou TPM (transações por minuto) no estado atual e projetado.
+
+  3.2. Qual é a proporção estimada entre leituras e escritas?
+
+- 90% leituras / 10% escritas?
+- 50/50?
+- 10% leituras / 90% escritas?
+
+  3.3. Quais são os requisitos de latência para operações críticas?
+
+- Tempo máximo aceitável para uma consulta de usuário final (por ex.: < 50 ms).
+- Latência para gravações (por ex.: confirmá-las em < 100 ms).
+
+  3.4. O sistema demanda alta taxa de throughput (MB/s ou IOPS)?
+
+- Volume de I/O esperado: (nº de leituras × tamanho médio do registro) + (nº de escritas × tamanho médio).
+- Qual a taxa de leituras sequenciais versus aleatórias?
+
+  3.5. Existe pico de carga conhecido (sazonalidade, eventos específicos)?
+
+- Black Friday, gerações de relatórios mensais, janelas de batch noturno etc.
+
+  3.6. Qual o limite de escalabilidade desejado?
+
+- Escalabilidade vertical (acréscimo de CPU/RAM/SSD).
+- Escalabilidade horizontal (sharding, replicação, partições).
+- Nível de crescimento adequado para suportar milhões de usuários/registros.
+
+---
+
+## 4. Consistência, Transações e Garantias ACID/BASE
+
+4.1. É necessário suporte a transações ACID (Atomicidade, Consistência, Isolamento, Durabilidade)?
+
+- Transações multi-registros (2-phase commit, rollbacks)?
+- Integridade referencial garantida?
+
+  4.2. Em caso de não-relacional, qual nível de consistência é aceitável?
+
+- Consistência forte (escreve e lê no líder).
+- Consistência eventual (replicas podem ler dados desatualizados por um curto período).
+- Consistência de sessão (cliente lê sua própria escrita).
+
+  4.3. O sistema exige isolamento serializável ou pode operar em níveis mais “brandos” de isolamento (snapshot, read committed)?
+
+  4.4. Há requisitos de garantias de entrega (exactly-once, at-least-once, at-most-once)?
+
+  4.5. Suporte a transações distribuídas (cross-shard ou cross-cluster)?
+
+- Necessidade de coordenar atualizações em múltiplos nós/regiões.
+
+---
+
+## 5. Operações de Consulta, Índices e Modelagem
+
+5.1. Quais campos e colunas precisarão de índice para atender às consultas mais frequentes?
+
+- Índices compostos por múltiplos campos?
+- Índices geoespaciais, full-text, TTL, JSONB, XML, JSON Path?
+
+  5.2. As consultas envolvem junções (joins) entre várias “tabelas”/coleções?
+
+- Joins complexos (N\:M grandes).
+- Necessidade de views materializadas?
+
+  5.3. No modelo de documento, qual será a estratégia de modelagem: “embed” (incorporação) vs “reference” (relacionamento por ID)?
+
+- Documentos aninhados grandes vs registros fragmentados em coleções separadas.
+- Trade-off entre duplicação de dados e performance de leitura.
+
+  5.4. Se optar por chave-valor, como serão estruturadas as chaves?
+
+- Convenção de nome (prefixos, namespaces).
+- TTL e expiração automática de chaves.
+
+  5.5. Para banco de grafo, quais tipos de relacionamentos serão recorrentes?
+
+- Profundidade e largura de arestas esperada (por ex.: 3 hops vs 10 hops).
+- Algoritmos de grafos necessários (PageRank, caminhos mais curtos).
+
+  5.6. Em wide-column, quais famílias de colunas e colunas dinâmicas são necessárias?
+
+- Tamanho médio por linha/coluna, cardinalidade de colunas.
+- Estratégia de particionamento de colunas para evitar hotspots.
+
+---
+
+## 6. Volume de Dados e Crescimento
+
+6.1. Qual o tamanho atual do banco (em GB/TB)?
+
+- Tamanho total de dados X tamanho de índices X logs de transação.
+
+  6.2. Taxa de ingestão de dados (novos registros por minuto/por hora/por dia)?
+
+- Exemplo: 1.000 novos registros/minuto, ou 100 GB/dia.
+
+  6.3. Qual a retenção histórica necessária?
+
+- Dados “quentes” (acessados com frequência) vs dados “frios” (acesso esporádico).
+- Políticas de arquivamento (por ex.: mover a S3, Data Lake, cold storage).
+
+  6.4. Crescimento projetado para 1, 2 e 5 anos (em volume e número de operações)?
+
+  6.5. Existe requisito de compactação ou compressão nativa de dados?
+
+- Compressão por coluna, compressão transparente (transparent data compression), rotação de logs.
+
+---
+
+## 7. Conectividade, Integração e Ecossistema
+
+7.1. Quais linguagens e frameworks a aplicação utiliza (Java, Python, .NET, Node.js etc.)?
+
+- Drivers oficiais e maturidade desses drivers para cada SGBD.
+
+  7.2. Haverá integração com outras ferramentas de BI/ETL?
+
+- Conectores nativos para Power BI, Tableau, Pentaho, Airflow etc.
+
+  7.3. É necessário integrar-se com sistemas legados ou bancos de dados existentes?
+
+- Migração de esquema e dados, replicação cruzada de tecnologias.
+
+  7.4. Que recursos nativos do provedor/fornecedor são relevantes?
+
+- Triggers, stored procedures, funções definidas pelo usuário, extensões (PostGIS, TimescaleDB).
+
+  7.5. Qual o nível de suporte e comunidade do produto?
+
+- Comunidade open-source ou licença comercial?
+- Disponibilidade de consultoria, documentação e fóruns ativos.
+
+---
+
+## 8. Disponibilidade, Replica e Recuperação de Desastres
+
+8.1. Qual o nível de uptime (SLA) exigido pelo negócio?
+
+- 99,9% (8 h de indisponibilidade anual), 99,99%, ou 99,999%?
+
+  8.2. Como será a estratégia de replicação?
+
+- Réplicas síncronas (sem perda de dados) ou assíncronas (menor latência de escrita)?
+- Quantas réplicas de leitura?
+
+  8.3. Em caso de falha, qual RTO (Recovery Time Objective) e RPO (Recovery Point Objective) são aceitáveis?
+
+  8.4. Precisará suportar failover automático?
+
+- Cluster gerenciado pelo próprio banco (ex.: Patroni + PostgreSQL, Galera Cluster no MySQL).
+- Serviços gerenciados em nuvem (RDS Multi-AZ, Cosmos DB, DynamoDB Global Tables).
+
+  8.5. Qual a estratégia de backup e restore?
+
+- Backups incrementais, point-in-time recovery, snapshots, exportação de arquivos (DMP).
+
+---
+
+## 9. Segurança e Conformidade
+
+9.1. Quais políticas de autenticação/autorização serão adotadas?
+
+- Autenticação integrada (Kerberos, LDAP, OAuth).
+- Controle de acesso granular (RBAC, ABAC).
+
+  9.2. É necessário criptografar dados em trânsito e em repouso?
+
+- TLS/SSL obrigatórios.
+- Chaves de criptografia gerenciadas pelo cliente (KMS) ou automáticas do fornecedor.
+
+  9.3. Há requisitos regulatórios (LGPD, GDPR, HIPAA, PCI-DSS)?
+
+- Pseudonimização, mascaramento de dados sensíveis, auditoria de acesso.
+
+  9.4. Necessidade de auditoria e logs forenses?
+
+- Logs de consultas — slow query log, auditoria de segurança.
+
+  9.5. Quais métodos de isolamento de rede serão usados?
+
+- Sub-redes privadas, VPC/VNet, firewalls, peering, VPNs.
+
+---
+
+## 10. Operações, Custos e Suporte
+
+10.1. O banco será autogerenciado ou usará serviço gerenciado em nuvem?
+
+- Instalar, configurar, tunar e fazer patch manualmente (On-premises/VM).
+- Serviço PaaS ou DBaaS (Amazon RDS/Aurora, Google Cloud SQL, Azure SQL, MongoDB Atlas).
+
+  10.2. Qual o orçamento disponível para licenças, infraestrutura e operação?
+
+- Custos de licenciamento por CPU, por RAM ou por instância?
+- Custo de instâncias cloud (instâncias reservadas vs sob demanda).
+
+  10.3. Qual é o nível de expertise da equipe em cada tecnologia?
+
+- Familiaridade interna com Oracle, SQL Server, PostgreSQL, MySQL, MongoDB, Cassandra, Redis, etc.
+- Custo de treinamento e curva de aprendizado.
+
+  10.4. Existe política de alta mecanização de operações (Infraestrutura como Código, CI/CD de banco)?
+
+- Ferramentas de automação (Terraform, Ansible, Flyway, Liquibase).
+
+  10.5. Quais métricas de operação precisam ser acompanhadas?
+
+- Tempo de resposta (P95, P99), utilização de CPU/RAM/IO, número de conexões, deadlocks, cache hit ratio.
+
+  10.6. Critérios de escalonamento de suporte e SLA do fornecedor (se for comercial).
+
+---
+
+## 11. Comparativo de Modelos (Checklist Prático)
+
+Para cada parte interessada (analista, engenheiro de dados, DBA, líder técnico), responda sim/não ou preencha valores nas colunas:
+
+| Questão                                                           | Relacional (SQL) | Documento (NoSQL) | Chave-Valor | Wide-Column (Cassandra/HBase) | Grafo (Neo4j/Dgraph) |
+| ----------------------------------------------------------------- | ---------------- | ----------------- | ----------- | ----------------------------- | -------------------- |
+| 1. Dados rigidamente estruturados?                                |                  |                   |             |                               |                      |
+| 2. Necessita JOINs frequentes entre entidades?                    |                  |                   |             |                               |                      |
+| 3. Transações ACID multi-linha ou multi-documento?                |                  |                   |             |                               |                      |
+| 4. Estrutura de documento JSON flexível?                          |                  |                   |             |                               |                      |
+| 5. Alta taxa de leitura por chave única?                          |                  |                   |             |                               |                      |
+| 6. Escritas massivas e distribuição geográfica?                   |                  |                   |             |                               |                      |
+| 7. Volume esperado > 100 TB de dados?                             |                  |                   |             |                               |                      |
+| 8. Modelagem de relacionamentos complexos?                        |                  |                   |             |                               |                      |
+| 9. Latência de leitura < 10 ms para 95% de queries?               |                  |                   |             |                               |                      |
+| 10. Necessidade de consultas de gráfico/ caminho mais curto?      |                  |                   |             |                               |                      |
+| 11. Cache embutido ou camada de in-memory?                        |                  |                   |             |                               |                      |
+| 12. Suporte a schemaless ou schema evolution?                     |                  |                   |             |                               |                      |
+| 13. Capacidade de escalabilidade horizontal por partição (shard)? |                  |                   |             |                               |                      |
+| 14. Garantia de consistência forte ou eventual?                   |                  |                   |             |                               |                      |
+| 15. Recursos de pesquisa full-text integrados?                    |                  |                   |             |                               |                      |
+
+_(Preencha cada célula com “Sim”, “Não” ou valores/observações específicas.)_
+
+---
+
+## 12. Conclusão e Priorização
+
+Após responder a todas as perguntas anteriores, atribua pesos a cada requisito (por exemplo, latência = 30 %, consistência = 20 %, escalabilidade = 25 %, custo = 25 %) e avalie cada modelo de banco de dados segundo estes pesos. Siga estes passos finais:
+
+1. **Pontuação Técnica**
+
+   - Para cada modelo (“Relacional”, “Documento”, “Chave-Valor” etc.), atribua nota de 0 a 5 em cada requisito antes ponderado.
+   - Calcule a pontuação ponderada total.
+
+2. **Prova de Conceito (PoC)**
+
+   - Implemente pequenos protótipos simulando leituras, escritas e consultas representativas.
+   - Meça latência, throughput e uso de recursos.
+
+3. **Análise de Riscos e Custos**
+
+   - Liste riscos (vendor lock-in, curva de aprendizado, integrações, limitações de query).
+   - Compare custos diretos (infra, licenciamento) e indiretos (treinamento, manutenção).
+
+4. **Decisão Final**
+
+   - Escolha o modelo que maximize a pontuação geral e minimize riscos.
+   - Documente a justificativa (requisitos que mais pesaram, ganhos/perdas em cada opção).
+
+---
+
+> **Observação:**
+> Esse questionário deve ser aplicado em conjunto com análises quantitativas (benchmarking de carga real) e qualitativas (competências da equipe, roadmap de negócio). As respostas fornecerão dados objetivos para comparar diferentes alternativas e tomar a decisão mais alinhada às necessidades reais.
+
+====================
+
+A seguir, um roteiro passo a passo para dimensionar uma base de dados de forma adequada, considerando simultaneidade de transações, volume de dados e processamento envolvido:
+
+1. **Levantamento de Requisitos Funcionais e Não-Funcionais**
+
+   - Liste as operações principais (reads, writes, updates, deletes).
+   - Defina SLAs de latência (por ex., 95% das consultas em < 50 ms) e de disponibilidade (por ex., 99,9%).
+   - Identifique picos esperados (black-fridays, relatórios mensais etc.).
+
+2. **Medição do Trabalho Atual e Projetado**
+
+   - **Transações Simultâneas**: use ferramentas de monitoramento (pg_stat_activity, Performance Schema, DMV…) para descobrir o número médio e o pico de conexões/queries por segundo.
+   - **Volume de Dados**: verifique tamanho atual (tabelas, índices, logs) e projete crescimento (por ex., + 20% ao ano).
+   - Documente padrões de acesso: leituras pesadas (BI), escritas intensivas (IoT), mix-read/write etc.
+
+3. **Classificação de Carga de Trabalho**
+
+   - **OLTP** (transações curtas e frequentes): foca em IOPS e latência de disco.
+   - **OLAP** (consultas analíticas longas): foca em throughput de CPU/memória e leitura sequencial.
+   - **HTAP/Misto**: avalie necessidades de ambos os perfis.
+
+4. **Dimensionamento de I/O (Disco e Rede)**
+
+   - Calcule IOPS requeridos:
+
+     ```
+     IOPS = (nº de leituras por seg. × 2) + nº de escritas por seg.
+     ```
+
+     (reads normalmente consomem \~2 I/O each; ajuste conforme seu storage).
+
+   - Dimensione a taxa de transferência (MB/s):
+
+     ```
+     Throughput ≈ tamanho médio da página × IOPS
+     ```
+
+   - Garanta banda de rede suficiente para replicação e backups.
+
+5. **Dimensionamento de CPU e Memória**
+
+   - **Memória**: suficiente para comportar working set (conjuntos de índices/tabelas mais usados) na cache do SGBD.
+
+     ```
+     RAM ≈ sum( buffer_pool + query_cache + sort_area + conexões × uso médio )
+     ```
+
+   - **CPU**: conte núcleos para suportar o grau de paralelismo de consultas e threads simultâneos. OLTP exige núcleos para concorrência; OLAP exige clocks mais altos e vetorização.
+
+6. **Armazenamento e Retenção de Dados**
+
+   - Estime disco para dados + índices + logs (+ 20 % de folga).
+   - Planeje políticas de purga e arquivamento (e.g. dados > 2 anos deslocados para Data Lake).
+   - Considere RAID, SSDs NVMe ou storage em nuvem com performance garantida (provisioned IOPS).
+
+7. **Arquitetura e Escalabilidade**
+
+   - **Vertical**: escala aumentando recursos da mesma instância. Simples, mas limitada.
+   - **Horizontal**: sharding, particionamento de tabelas, réplicas de leitura. Complexo, mas permite > 1 M TPS.
+   - Avalie soluções de clustering (e.g. PostgreSQL + Patroni, MySQL Group Replication, MongoDB Replica Set).
+
+8. **Índices e Otimização de Esquema**
+
+   - Analise query plans; crie índices covering para consultas críticas.
+   - Use particionamento (range, hash) para tabelas grandes.
+   - Normalize até o ponto de performance; desnormalize quando necessário (caches, colunas precalculadas).
+
+9. **Caching e Camada de Aplicação**
+
+   - Utilize cache distribuído (Redis, Memcached) para leituras repetitivas de baixa volatilidade.
+   - Implemente TTLs e mecanismos de invalidação de cache alinhados ao SGBD.
+
+10. **Alta Disponibilidade e Recuperação de Desastres**
+
+    - Provisione réplicas síncronas ou assíncronas para failover automático.
+    - Configure backups contínuos e testes regulares de restore.
+    - Planeje zonas de disponibilidade diferentes (AZs/Regiões).
+
+11. **Testes de Carga e Benchmarking**
+
+    - Simule carga com JMeter, sysbench, pgbench, Olio ou ferramentas específicas.
+    - Meça latência, throughput e consumo de recursos sob cenários de pico.
+    - Ajuste parâmetros (connection pool, work_mem, innodb_buffer_pool_size etc.).
+
+12. **Monitoramento Contínuo e Ajustes**
+
+    - Instale ferramentas de observabilidade (Prometheus+Grafana, Datadog, New Relic).
+    - Monitore métricas-chave: CPU, RAM, IOPS, locks, waits, latências 95/99.
+    - Estabeleça alertas para tendências (uso de disco > 80 %, lock escalations etc.) e revisite seu plano a cada trimestre.
+
+---
+
+> **Dica final:** documente cada etapa do dimensionamento, mantenha um histórico de métricas e revisite suas projeções sempre que o perfil de uso mudar significativamente. Isso garante que sua base de dados escale de forma confiável e econômica.
